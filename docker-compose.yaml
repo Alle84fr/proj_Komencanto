@@ -1,0 +1,51 @@
+# definir a versão do Docker que será usada, até o dia 29/28/2025 a mais usada é 3.8
+
+version: "3.8"
+
+#1° nomear o banco de dados
+#2° trazer a imagem, que possui todo conteúdo para  rodar a plicação (image: )
+# a 14-alpine chega ser mais leve que outras com slim
+#3° se será reiniciado automaticamente (restar: always) sempre reinicia
+#4° ambiente em sí que possui:
+#  como será postgresql, deve refenciar-lo antes
+#  5° POSTGRES_USER - nome do usuário
+#  6° POSTGRES_PASSWORD -  senha do usuário
+#  7° POSTGRES_BD - nome dado ao banco de dados que será criado no postgre 
+#8° volume - garante que a cada reinicialização, não será perdido os dados já armazenados
+
+#componentes do contêiner
+services:
+  bd:
+    image: postgres:14-alpine
+    restart: always
+    # usarei sistema de diconário, que não tem - na frente (- POSTGRES_USER : admin)
+    # caso seja de lista de por = no lugar do : (POSTGRES_USER = admin)
+    environment:
+      POSTGRES_USER : admin
+      POSTGRES_PASSWORD : 123987
+      POSTGRES_DB : koincanto_bd
+    volumes:
+    # será na pasta local, criada pelo docker, ./data/db
+      - ./data/db:/var/lib/postgresql/data
+
+  #2° serviço para ser criado - web
+  #1° contruir a imagem a partir do Dockerfile (localizado na pasta raiz)
+  #"." simboloza a pasta raiz
+  #2° sistea re restart, mesmo que o anterior
+  #3° ports, qual valor da porta de acesso
+  #4° volumme, pegará todo conteúdo da pasta raiz e armazenará nas pasta app do contêiner
+  # "." pasta raiz
+  # ":" separador entre host e contêiner
+  # app - é uma convenção dar este nome à pasta do contêiner (não é do projeto)
+  #5° depends_on - para ver se o bd está saudável, sendo iniciado e conectado
+  web:
+    build: .
+    restart: always
+    ports:
+      #algumas vezes tem de tirar as " "
+      #contêiner para host
+      - "5000:5000" 
+    volumes:
+      - .:/app
+    depends_on:
+      - db
