@@ -13,7 +13,9 @@ cd .. para voltar um pasta
 fora do VSCode, abrir Docker file( se não abrir dará erro)
 
 // lê o docker-compose
-docker-compose -f docker-compose.yaml config 
+
+- docker-compose -f docker-compose.yaml config 
+
 saída poser ser assim
 docker compose -f docker-compose.yaml config
 name: proj_komencanto
@@ -58,3 +60,16 @@ services:
 networks:
   default:
     name: proj_komencanto_default
+
+segundo teste - subir os contêiners
+
+- docker compose -f docker-compose.yaml up --build
+
+erro
+failed to solve: process "/bin/sh -c pip install --no-cache-dir -r requirements.txt" did not complete successfully: exit code: 1
+
+docker não subiu um ou mais pacotes, pode ser pacote não atualizado, inexistente, etc
+
+web-1 exited with code 2
+web-1 -> nome do contêiner de aplicação web, -1 é a instância
+exited with code 2 - app.py não foi encontrada
