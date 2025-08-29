@@ -67,3 +67,7 @@ Gerenciamento de ambiente = Docker
 Upload
 
 publicado em servidor da internet, neste casos será o render
+
+#### Estrutura
+
+

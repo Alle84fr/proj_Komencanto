@@ -38,3 +38,4 @@ faz integração do banco de dados
 ### psycopg2-binary
 
 adaptador .py para usar postgres com classes e objetos?
+
