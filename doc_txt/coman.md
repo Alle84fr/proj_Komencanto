@@ -73,3 +73,7 @@ docker não subiu um ou mais pacotes, pode ser pacote não atualizado, inexisten
 web-1 exited with code 2
 web-1 -> nome do contêiner de aplicação web, -1 é a instância
 exited with code 2 - app.py não foi encontrada
+
+-docker compose -f docker-compose.yaml down
+
+depois que para docker rodar para remover os contêineres e a rede criada (mas manter os dados do banco de dados 
