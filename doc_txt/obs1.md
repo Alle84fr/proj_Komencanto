@@ -12,7 +12,7 @@ Homens e mulheres, localizanos na cidade São Paulo, adolescentes, adultos e ido
 
 #### Funcionalidade:
 
-##### Principal:
+##### Principal:(1° fase)
 
 Inserção dos principais serviços:
 
@@ -30,7 +30,7 @@ Em caso de Customização = Barra, manga, decote, aplique, estamparia, mudança 
 
 Adicionar contato, endereço 
 
-##### Dados básicos do cliente:
+##### Dados básicos do cliente:(2°)
 
 Adicionar método de pagamento
 
@@ -38,13 +38,13 @@ Login com verificação de nome, senha, criptografar, armazenar
 
 BD com dados do cliente como nome, e-mail, telefone
 
-##### Dados básicos dos serviços pretados:
+##### Dados básicos dos serviços pretados:(3°)
 
 Adiconar no banco de dados do cliente serviços prestados, observação sobre pagamentos feitos (se foi feito, se atrasou, se dividiu), qual serviço foi prestado, se foi entregue
 
 Adicionar tamanho pp, p, m, g, gg (ou 36, 40, 44 ...)
 
-##### Adcionar estimulos visuais:
+##### Adcionar estimulos visuais:(4°)
 
 Adcionar imagens que possar ajudar o cliente a escolher, exemplo, usuário feminino, possui camiseta héring, na cor rosa, quer estampa localizada, haverá ao lado, em baixo três imagens, genéricas, com estampa censtralizada no peito, um na lateral perto da costura lateral e outra na barra fora do eixo central
 
@@ -62,12 +62,26 @@ Banco de dados = Postgresql
 
 Gerenciamento de ambiente = Docker
 
+organizar com VMC (model, view e ?) e blueprint (ter separado model, rota, config, app, docker, etc)
+
+deploy no render
+
 #### Deploy
 
 Upload
 
 publicado em servidor da internet, neste casos será o render
 
-#### Estrutura
+#### Blueprint
+
+forma de organização do projeto, separando model, rote, view, 
+
+deixa mais organizado, modula o código (ex: parte para usuário)
+
+escalabilidade
+
+define prefixo URL para todas rotas
+
+cada Blueprint pode ter seu template e arquivo estético (CSS.JS.imagens ...)
 
 

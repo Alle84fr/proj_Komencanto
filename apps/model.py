@@ -1,12 +1,13 @@
 
 from sqlalchemy import create_engine,Column, Integer, String
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm.exc import NoResultFound
 
 dict_servicos = [
-    {"categoria": "confecção", "tipo": "camiseta", "sexo": "feminina", "servico": " ","detalhe": "confecção de camiseta com gola careca, manga curta, justo"},
+    {"categoria": "confecção", "tipo": "camiseta", "sexo": "feminina", "servico": " ","detalhes": "confecção de camiseta com gola careca, manga curta, justo"},
     {"categoria": "customização", "tipo": "camiseta", "sexo": "feminina", "servico": "estamparia", "detalhes": "estampa com nome ADS impacta"},
-    {"categoria": "conserto", "tipo": "camiseta", "sexo": "feminina", "servico": "costurar lateral descosturada","detalhe": " "},
-    {"categoria": "conserto", "tipo": "blazer", "sexo": "masculino", "servico": "troca de forro","detalhe": "Forro de cetin preto"}
+    {"categoria": "conserto", "tipo": "camiseta", "sexo": "feminina", "servico": "costurar lateral descosturada","detalhes": " "},
+    {"categoria": "conserto", "tipo": "blazer", "sexo": "masculino", "servico": "troca de forro","detalhes": "Forro de cetin preto"}
 ]
 
 # declarative_base = função, método. Conceito do SQLAlchemy que irá representar as tabelas de dados, local onde as tabelas (metadados - inforações sobre a estrutura- ficam), mapea atributos da classe .py, permite que gere comandos SQL como CREATE TABEL, SELECT ...
@@ -95,6 +96,82 @@ def preencher_tabela(engine):
     
     #sempre fechar sessão depois de abrir
     session.close()
+    
+#_________________ CRUD _________________________________________________________________
 
+#_________________ GET ALL
 
+def get_all_serv(engine):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    servicos = session.query(Servico).all()
+    session.close()
+    return servicos
 
+#_________________ GET ID
+
+def get_id_serv(engine, serv_id):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    
+    try:
+        # session - área de trabalho, interface entre .py e bd
+        # query pesquisa
+        # Serviço - classe file model.py
+        # filter_by(valor) - filtrar pelo valor informado
+        # variável id recebe serv_id
+        # método que retorna apenas um único resultado
+        servicos = session.query(Servico).filter_by(id = serv_id).one()
+        session.close()
+        return servicos
+    except NoResultFound:
+        session.close()
+        return None
+    
+#_________________ POST
+
+def put_serv(engine, add_serv):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    novo_serv = Servico(
+        categoria = add_serv.get("categoria"),
+        tipo = add_serv.get("tipo"),
+        sexo = add_serv.get("sexo"),
+        servico = add_serv.get("servico"),
+        detalhes = add_serv.get("detalhes")        
+    )
+    session.add(novo_serv)
+    session.commit()
+    session.close()
+    return novo_serv.id
+
+#_________________ UPDATE
+
+def update_serv(engine, serv_id, atualizar_serv):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    servicos = session.query(Servico).filter_by(id = serv_id).first()
+    if servicos:
+        for key, value in atualizar_serv.items():
+            setattr(servicos, key, value)
+        
+        session.commit()
+        session.close()
+        return True
+    
+    session.close()
+    return False
+
+#_________________ DELETE
+
+def del_serv(engine, serv_id):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    servicos = session.query(Servico).filter_by(id = serv_id).first()
+    if servicos:
+        session.delete(servicos)
+        session.commit()
+        session.close()
+        return True
+    session.close()
+    return False
