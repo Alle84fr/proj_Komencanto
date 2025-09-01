@@ -1,13 +1,15 @@
 #rotas
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, jsonify, abort
 from config import get_engine as getEn
-from model import Servico
-from sqlalchemy.orm import sessionmaker
+import model as mod
+import http
 
 bp = Blueprint("main", __name__)
 
 #________________________________ DEFININDO ROTAS _______________________________________
+
+#_________________ PAG PRINCIPAL GET
 
 @bp.route("/", methods=["GET"])
 
@@ -17,18 +19,40 @@ def rota_pricipal():
     # eng = engine
     #Session expplicado em model.py
     eng = getEn()
-    Session = sessionmaker(bind=eng)
-    session = Session()
+    servicos = mod.get_all_serv(eng)
+    return render_template("index.html", servicos=servicos)
 
-    #_________________ Consulta todos dados
+#_________________ PAG PRINCIPAL POST
 
-    servicos = session.query(Servico).all()
+@bp.route("/cadastro", methods=["GET", "POST"])
+def rota_cadastro():
+    if request.method == "POST":
+        # get o dados
+        dados_servico = {
+            "categoria": request.form.get("categoria"),
+            "tipo": request.form.get("tipo"),
+            "sexo": request.form.get("sexo"),
+            "servico": request.form.get("servico"),
+            "detalhes": request.form.get("detalhes")
+        }
+        
+        # valisar os dados
+        if not all(dados_servico.values()):
+            return render_template("cadastro.html", erro="Preencher todos os campos"), http.HTTPStatus.BAD_REQUEST
 
-    #_________________ Fechar sessão
+        eng = getEn()
+        try:
+            novo_servico_id = mod.put_serv(eng, dados_servico)
+            return render_template("cadastro feito.html", servico_id=novo_servico_id), http.HTTPStatus.CREATED
+        except Exception as e:
+            print(f"Erro ao criar serviço: {e}")
+            return render_template("erro.html", mensagem="Falha ao criar o serviço, tente mais tarde"), http.HTTPStatus.INTERNAL_SERVER_ERROR
+    
+    #renderiza pag de cadastro
+    return render_template("cadastro.html")
 
-    session.close()
+#Erros não encontrados
+@bp.errorhandler(http.HTTPStatus.NOT_FOUND)
+def pag_nao_encont(e):
+    return render_template("erro.html", mensagem="Serviço não encontrado"), http.HTTPStatus.NOT_FOUND
 
-    #_________________ Renderização
-
-    # index refere-se à pag inicial, principal
-    return render_template("index.html", servicos = servicos)
