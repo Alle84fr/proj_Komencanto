@@ -48,7 +48,13 @@ class Servico(Base):
         return f"<Servico(id = {self.id}, categoria = {self.categoria}, tipo = {self.tipo}, sexo = {self.sexo}, servico = {self.servico}, detalhes = {self.detalhes})>"
 
 
-#_________________ CRIAR TABELAS_________________________________________________________
+#_________________ GERENCIADOR DE BD ______________________________________________________
+
+def get_smk(engine):
+    Session = sessionmaker(bind=engine)
+    return Session()
+
+#_________________ CRIAR TABELAS___________________________________________________________
 
 
 #função de inicialização do bd
@@ -72,48 +78,49 @@ def preencher_tabela(engine):
     #1° será a classe, o 2° variável que recebe a classe recém criada
     #cria uma área de trabalho temporária de interação entre .py e bd
     #Session é nome comumente usado
-    Session = sessionmaker(bind=engine)
+    Session = get_smk(bind=engine)
     session = Session()
     
-    # se (query) consuta da interação, com dados da classe serviço, for igual a "vazia"
-    if session.query(Servico).count() == 0:
-        #para cada dados_serviço no dicionário feito anterioremente
-        for dados_servico in dict_servicos:
-            novo_servico = Servico(
-                #variável categoria recebe = o dado_servico[na chave "categoria"]
-                categoria = dados_servico["categoria"],
-                tipo = dados_servico["tipo"],
-                sexo = dados_servico["sexo"],
-                servico = dados_servico["servico"],
-                detalhes = dados_servico["detalhes"]
-            )
+    try:
+        # se (query) consuta da interação, com dados da classe serviço, for igual a "vazia"
+        if session.query(Servico).count() == 0:
+            #para cada dados_serviço no dicionário feito anterioremente
+            for dados_servico in dict_servicos:
+                novo_servico = Servico(
+                    #variável categoria recebe = o dado_servico[na chave "categoria"]
+                    categoria = dados_servico["categoria"],
+                    tipo = dados_servico["tipo"],
+                    sexo = dados_servico["sexo"],
+                    servico = dados_servico["servico"],
+                    detalhes = dados_servico["detalhes"]
+                )
 
-            #add novos serviços à sessão
-            session.add(novo_servico)
-            
-        #confirmando
-        session.commit()
-    
-    #sempre fechar sessão depois de abrir
-    session.close()
-    
-#_________________ CRUD _________________________________________________________________
+                #add novos serviços à sessão
+                session.add(novo_servico)
+                
+            #confirmando
+            session.commit()
+    finally:
+        #sempre fechar sessão depois de abrir
+        session.close()
+        
+#______________________________________CRUD ____________________________________________
 
 #_________________ GET ALL
 
 def get_all_serv(engine):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    servicos = session.query(Servico).all()
-    session.close()
-    return servicos
+    session = get_smk(bind=engine)
+    try:
+        return session.query(Servico).all()
+    finally:
+        session.close()
+    
 
 #_________________ GET ID
 
 def get_id_serv(engine, serv_id):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    
+    session = get_smk(bind=engine)
+     
     try:
         # session - área de trabalho, interface entre .py e bd
         # query pesquisa
@@ -121,57 +128,52 @@ def get_id_serv(engine, serv_id):
         # filter_by(valor) - filtrar pelo valor informado
         # variável id recebe serv_id
         # método que retorna apenas um único resultado
-        servicos = session.query(Servico).filter_by(id = serv_id).one()
-        session.close()
-        return servicos
-    except NoResultFound:
-        session.close()
+        return session.query(Servico).filter_by(id = serv_id).one()
+    except:
         return None
+    finally:
+        session.closer()
     
 #_________________ POST
 
 def put_serv(engine, add_serv):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    novo_serv = Servico(
-        categoria = add_serv.get("categoria"),
-        tipo = add_serv.get("tipo"),
-        sexo = add_serv.get("sexo"),
-        servico = add_serv.get("servico"),
-        detalhes = add_serv.get("detalhes")        
-    )
-    session.add(novo_serv)
-    session.commit()
-    session.close()
-    return novo_serv.id
+    session = get_smk(bind=engine)
+    
+    try:
+        #** passa os dados do dict para a classe Servico
+        novo_serv = Servico(**add_serv)        
+        session.add(novo_serv)
+        session.commit()
+        return novo_serv.id
+    finally:
+        session.close()
 
 #_________________ UPDATE
 
 def update_serv(engine, serv_id, atualizar_serv):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    servicos = session.query(Servico).filter_by(id = serv_id).first()
-    if servicos:
-        for key, value in atualizar_serv.items():
-            setattr(servicos, key, value)
-        
-        session.commit()
+    session = get_smk(bind=engine)
+    try:
+        #.one_or_none é mais seguro que on()first(), porque  retorna ainstância ou não retona
+        servicos = session.query(Servico).filter_by(id = serv_id).one_or_none()
+        if servicos:
+            for key, value in atualizar_serv.items():
+                setattr(servicos, key, value)
+            session.commit()
+            return True
+        return False
+    finally:
         session.close()
-        return True
-    
-    session.close()
-    return False
 
 #_________________ DELETE
 
 def del_serv(engine, serv_id):
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    servicos = session.query(Servico).filter_by(id = serv_id).first()
-    if servicos:
-        session.delete(servicos)
-        session.commit()
+    session = get_smk(bind=engine)
+    try:
+        servicos = session.query(Servico).filter_by(id = serv_id).first()
+        if servicos:
+            session.delete(servicos)
+            session.commit()
+            return True
+        return False
+    finally:
         session.close()
-        return True
-    session.close()
-    return False
