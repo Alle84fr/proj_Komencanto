@@ -23,7 +23,7 @@ eng = getEn()
 mod.criar_tabela(eng)
 mod.preencher_tabela(eng)
 
-#_________________________ ROTAS ________________________________________________________
+#_________________________ ROTAS BLUEPRINT ________________________________________________
 
 # registro de rota, associando ao blueprint do rote.py
 app.register_blueprint(bp)
