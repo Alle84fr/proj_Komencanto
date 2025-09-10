@@ -1,10 +1,12 @@
 #rotas
 
 from flask import Blueprint, render_template, request, jsonify, abort
-from config import get_engine as getEn
-import model as mod
+from apps.config import get_engine as getEn
+import apps.model as mod
 import http
 
+# bp =  blueprint
+# aqui será o "link" entre rotas a app
 bp = Blueprint("main", __name__)
 
 #________________________________ DEFININDO ROTAS _______________________________________
@@ -43,7 +45,7 @@ def rota_cadastro():
         eng = getEn()
         try:
             novo_servico_id = mod.put_serv(eng, dados_servico)
-            return render_template("cadastro feito.html", servico_id=novo_servico_id), http.HTTPStatus.CREATED
+            return render_template("cadastro_feito.html", servico_id=novo_servico_id), http.HTTPStatus.CREATED
         except Exception as e:
             print(f"Erro ao criar serviço: {e}")
             return render_template("erro.html", mensagem="Falha ao criar o serviço, tente mais tarde"), http.HTTPStatus.INTERNAL_SERVER_ERROR
@@ -56,3 +58,4 @@ def rota_cadastro():
 def pag_nao_encont(e):
     return render_template("erro.html", mensagem="Serviço não encontrado"), http.HTTPStatus.NOT_FOUND
 
+#apps/route.py

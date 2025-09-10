@@ -6,9 +6,9 @@
 # define rotas
 
 from flask import Flask, render_template
-from config import get_engine as getEn
-import model as mod
-from route import bp
+from apps.config import get_engine as getEn
+import apps.model as mod
+from apps.route import bp
 
 #instanciando a classe Flask
 #(__name__), é um ponto que referência, que linka a outro file
@@ -35,3 +35,5 @@ app.register_blueprint(bp)
 #inicializa se o file for o principal
 if __name__ == "__main__":
     app.run(debug=True)
+    
+#app.py

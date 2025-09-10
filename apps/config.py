@@ -2,6 +2,7 @@
 
 #biblioteca para interagir com sistema operacional
 import os
+from sqlalchemy import create_engine
 
 class Config:
     #DATABASE = banco de dados
@@ -10,4 +11,9 @@ class Config:
     # esta classe de conexão com o banco de dados
     #lê o ambinete do banco de dados
     
-    DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://admin:17539@db:5432/komincanto_bd")
+    DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://admin:17539@localhost:5432/komincanto_bd")
+
+def get_engine():
+    return create_engine(Config.DATABASE_URL)
+
+#apps/config.py

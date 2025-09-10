@@ -51,8 +51,15 @@ class Servico(Base):
 #_________________ GERENCIADOR DE BD ______________________________________________________
 
 def get_smk(engine):
-    Session = sessionmaker(bind=engine)
-    return Session()
+    #função retorna a classe
+    #1° criar nova classe que receberá irá interagir com o bd (classe de sessão)
+    #sessionmaker() = função cria novas classes de sessão
+    #bind=engine = qualquer sessão criada estará, automaticanete, conecta ao bd
+    #1° será a classe, o 2° variável que recebe a classe recém criada
+    #cria uma área de trabalho temporária de interação entre .py e bd
+    #Session é nome comumente usado
+    return sessionmaker(bind=engine)
+    
 
 #_________________ CRIAR TABELAS___________________________________________________________
 
@@ -72,13 +79,8 @@ def criar_tabela(engine):
 # coloca os dados do dict_servicos, SOMENTE SE A TABELA ESTIVER VAZIA
 def preencher_tabela(engine):
     
-    #1° criar nova classe que receberá irá interagir com o bd (classe de sessão)
-    #sessionmaker() = função cria novas classes de sessão
-    #bind=engine = qualquer sessão criada estará, automaticanete, conecta ao bd
-    #1° será a classe, o 2° variável que recebe a classe recém criada
-    #cria uma área de trabalho temporária de interação entre .py e bd
-    #Session é nome comumente usado
-    Session = get_smk(bind=engine)
+    
+    Session = get_smk(engine)
     session = Session()
     
     try:
@@ -109,7 +111,8 @@ def preencher_tabela(engine):
 #_________________ GET ALL
 
 def get_all_serv(engine):
-    session = get_smk(bind=engine)
+    Session = get_smk(engine)
+    session = Session()
     try:
         return session.query(Servico).all()
     finally:
@@ -119,7 +122,8 @@ def get_all_serv(engine):
 #_________________ GET ID
 
 def get_id_serv(engine, serv_id):
-    session = get_smk(bind=engine)
+    Session = get_smk(engine)
+    session = Session()
      
     try:
         # session - área de trabalho, interface entre .py e bd
@@ -132,12 +136,14 @@ def get_id_serv(engine, serv_id):
     except:
         return None
     finally:
-        session.closer()
+        # aqui é close, não closer
+        session.close()
     
 #_________________ POST
 
 def put_serv(engine, add_serv):
-    session = get_smk(bind=engine)
+    Session = get_smk(engine)
+    session = Session()
     
     try:
         #** passa os dados do dict para a classe Servico
@@ -151,7 +157,8 @@ def put_serv(engine, add_serv):
 #_________________ UPDATE
 
 def update_serv(engine, serv_id, atualizar_serv):
-    session = get_smk(bind=engine)
+    Session = get_smk(engine)
+    session = Session()
     try:
         #.one_or_none é mais seguro que on()first(), porque  retorna ainstância ou não retona
         servicos = session.query(Servico).filter_by(id = serv_id).one_or_none()
@@ -167,7 +174,8 @@ def update_serv(engine, serv_id, atualizar_serv):
 #_________________ DELETE
 
 def del_serv(engine, serv_id):
-    session = get_smk(bind=engine)
+    Session = get_smk(engine)
+    session = Session()
     try:
         servicos = session.query(Servico).filter_by(id = serv_id).first()
         if servicos:
@@ -177,3 +185,5 @@ def del_serv(engine, serv_id):
         return False
     finally:
         session.close()
+
+#apps/model.py

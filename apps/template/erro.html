@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro - Ateliê Online</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-overlay"></div>
+        <div class="header-content">
+            <h1 class="header-title">Ateliê Online</h1>
+            <nav class="nav">
+                <a href="{{ url_for('main.rota_pricipal') }}" class="btn">Serviços</a>
+                <a href="#" class="btn">Login</a>
+                <a href="{{ url_for('main.rota_cadastro') }}" class="btn">Cadastro</a>
+                <a href="#" class="btn">Desenvolvedores</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="error-page">
+            <h2>Oops! Ocorreu um erro.</h2>
+            <p>{{ mensagem }}</p>
+            <a href="{{ url_for('main.rota_pricipal') }}" class="btn">Voltar para a página inicial</a>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Rua VejaBem n° 404 bairro:Python SP capital</p>
+    </footer>
+
+</body>
+</html>

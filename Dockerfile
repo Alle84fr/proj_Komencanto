@@ -34,3 +34,6 @@ COPY . .
 #será na linguagem py
 #será na pasta app.py
 CMD ["python","app.py"]
+
+#Dockerfile
+

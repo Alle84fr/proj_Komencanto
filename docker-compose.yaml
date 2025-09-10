@@ -1,6 +1,6 @@
 # definir a versão do Docker que será usada, até o dia 29/28/2025 a mais usada é 3.8
 #       ESTA VERSÃO DEU ERRO "service "web" depends on undefined service "db": invalid compose project", sugestão foi deixar sem
-#version: "3.8"
+version: "3.9"
 
 #1° nomear o banco de dados
 #2° trazer a imagem, que possui todo conteúdo para  rodar a plicação (image: )
@@ -21,17 +21,25 @@ services:
 
         restart: always
 
+        ports:
+            - "5432:5432"
+
         # usarei sistema de diconário, que não tem - na frente (- POSTGRES_USER : admin)
         # caso seja de lista de por = no lugar do : (POSTGRES_USER = admin)
         #os : pontos devem estar juntos da chave(chave: valor), caso contrário dará erro - service "web" depends on undefined service "db": invalid compose project
         environment:
             POSTGRES_USER: admin
             POSTGRES_PASSWORD: 17539
-            POSTGRES_DB: koincanto_bd
+            POSTGRES_DB: komincanto_bd
 
         volumes:
              # será na pasta local, criada pelo docker, ./data/db
-            - ./data/db:/var/lib/postgresql/data
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U admin -d komincanto_bd"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     #2° serviço para ser criado - web
     #1° contruir a imagem a partir do Dockerfile (localizado na pasta raiz)
@@ -45,22 +53,24 @@ services:
     #5° depends_on - para ver se o bd está saudável, sendo iniciado e conectado
     web:
         build: .
-
         restart: always
-
         ports:
-          #algumas vezes tem de tirar as " "
-          #contêiner para host
             - "5000:5000"
-
         volumes:
             - .:/app
-
+        environment:
+            DATABASE_URL: "postgresql://admin:17539@db:5432/komincanto_bd"
+        command: python app.py
         depends_on:
-            - db
+            # "db" deve ser o nome do serviço, e a condição
+            db:
+                condition: service_healthy
+
 
 volumes:
 
-    db_data:
+    postgres_data:
 
         driver: local
+
+#docker-compose.yaml
